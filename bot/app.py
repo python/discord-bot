@@ -1,9 +1,17 @@
 import os
+import logging
 import flask
 from discord.ext import commands
 
 bot = commands.Bot(command_prefix="!")
 TOKEN = os.getenv("DISCORD_TOKEN")
+
+LOG = logging.getLogger('apscheduler.executors.default')
+LOG.setLevel(logging.DEBUG)  # DEBUG
+FMT = logging.Formatter('%(levelname)s:%(name)s:%(message)s')
+H = logging.StreamHandler()
+H.setFormatter(FMT)
+LOG.addHandler(H)
 
 APP = flask.Flask(__name__)
 @APP.route('/', methods=['GET', 'POST'])
