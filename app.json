@@ -1,0 +1,11 @@
+{
+	"name": "bot reginald",
+	"description": "discord bot",
+	"website": "https://globbot.herokuapp.com/",
+	"repository": "https://github.com/gobisa/discord-bot",
+	"buildpacks": [
+		{
+			"url": "heroku/python"
+		}
+	]
+}
