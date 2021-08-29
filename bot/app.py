@@ -1,9 +1,14 @@
 import os
+import flask
 from discord.ext import commands
 
 bot = commands.Bot(command_prefix="!")
 TOKEN = os.getenv("DISCORD_TOKEN")
 
+APP = flask.Flask(__name__)
+@APP.route('/', methods=['GET', 'POST'])
+def index():
+    return "bot is running"
 
 @bot.event
 async def on_ready():
