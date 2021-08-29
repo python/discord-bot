@@ -27,6 +27,10 @@ async def on_ready():
 async def ping(ctx):
     await ctx.send("pong")
 
+@bot.command(name="bing")
+async def ping(ctx):
+    await ctx.send("bong")
+
 
 if __name__ == "__main__":
     bot.run(TOKEN)
