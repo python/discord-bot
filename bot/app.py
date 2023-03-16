@@ -1,5 +1,6 @@
 import os
 
+import discord
 import httpx
 import tiktoken
 from discord.ext import commands
@@ -9,7 +10,9 @@ from util_openai import get_pep_text, text_to_chunks, send_partial_text, summari
 
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 
-bot = commands.Bot(command_prefix="!")
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix="!", intents=intents)
 async_http_client = httpx.AsyncClient()
 
 
