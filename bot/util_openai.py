@@ -3,7 +3,7 @@ from typing import Generator
 
 import openai_async
 
-OPEN_AI_API_KEY = os.getenv("OPEN_AI_API_KEY")
+from conf import OPEN_AI_API_KEY
 
 
 def text_to_chunks(

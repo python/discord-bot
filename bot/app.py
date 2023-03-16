@@ -5,10 +5,9 @@ import httpx
 import tiktoken
 from discord.ext import commands
 
+from conf import DISCORD_TOKEN
 from util_openai import get_pep_text, text_to_chunks, send_partial_text, summarize
 
-
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 
 intents = discord.Intents.default()
 intents.message_content = True
