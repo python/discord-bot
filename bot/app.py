@@ -5,11 +5,13 @@ import tiktoken
 from discord.ext import commands
 
 from conf import DISCORD_TOKEN
+from cache import SimpleTTLCache
 from util_openai import get_pep_text, text_to_chunks, send_partial_text, summarize
 
 
 intents = discord.Intents.default()
 intents.message_content = True
+cache = SimpleTTLCache(100)
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 
@@ -31,6 +33,10 @@ async def tldr(ctx, target: str, number: int):
 
     try:
         target_pep = f"pep-{number:04d}"
+        cached_result = cache.get(target_pep)
+        if cached_result:
+            await ctx.send(cached_result)
+            return
         pep_text = await get_pep_text(target_pep)
         encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
         responses = []
@@ -40,6 +46,8 @@ async def tldr(ctx, target: str, number: int):
             responses.append(res)
 
         summary = await summarize(target_pep, responses)
+        # Caching for 10 mins
+        cache.put(target_pep, summary, 60 * 10)
         await ctx.send(summary)
     except Exception as e:
         await ctx.send(f"Error: {e}")
