@@ -1,6 +1,7 @@
 import os
 from typing import Generator
 
+import httpx
 import openai_async
 
 from conf import OPEN_AI_API_KEY
@@ -16,16 +17,19 @@ def text_to_chunks(
         yield chunk
 
 
-async def get_pep_text(client, target_pep: str) -> str:
-    target = f"https://raw.githubusercontent.com/python/peps/main/{target_pep}.rst"
-    res = await client.get(target)
-    if res.status_code == 404:
-        # fallback
-        target = f"https://raw.githubusercontent.com/python/peps/main/{target_pep}.txt"
+async def get_pep_text(target_pep: str) -> str:
+    async with httpx.AsyncClient() as client:
+        target = f"https://raw.githubusercontent.com/python/peps/main/{target_pep}.rst"
         res = await client.get(target)
-        if res.status_code == 404:
-            raise RuntimeError("Not found")
-    return res.text
+        if res.status_code != 200:
+            # fallback
+            target = (
+                f"https://raw.githubusercontent.com/python/peps/main/{target_pep}.txt"
+            )
+            res = await client.get(target)
+            if res.status_code != 200:
+                raise RuntimeError("Not found")
+        return res.text
 
 
 async def send_partial_text(text: str, target_pep: str) -> str:

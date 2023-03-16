@@ -1,7 +1,6 @@
 import os
 
 import discord
-import httpx
 import tiktoken
 from discord.ext import commands
 
@@ -12,7 +11,6 @@ from util_openai import get_pep_text, text_to_chunks, send_partial_text, summari
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
-async_http_client = httpx.AsyncClient()
 
 
 @bot.event
@@ -33,7 +31,7 @@ async def tldr(ctx, target: str, number: int):
 
     try:
         target_pep = f"pep-{number:04d}"
-        pep_text = await get_pep_text(async_http_client, target_pep)
+        pep_text = await get_pep_text(target_pep)
         encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
         responses = []
         for chunk in text_to_chunks(encoding, pep_text):
