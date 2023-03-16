@@ -1,3 +1,4 @@
 discord.py==1.7.3
 openai-async==0.0.3
 tiktoken==0.3.1
+httpx==0.23.3
