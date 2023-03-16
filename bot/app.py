@@ -30,7 +30,7 @@ async def ping(ctx):
 async def tldr(ctx, target: str, number: int):
     if target.lower() != "pep":
         await ctx.send("Only supports for PEP doucments right now.")
-
+        return
     try:
         target_pep = f"pep-{number:04d}"
         cached_result = cache.get(target_pep)
