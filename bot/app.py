@@ -29,13 +29,14 @@ async def ping(ctx):
 @bot.command(name="tldr")
 async def tldr(ctx, target: str, number: int):
     if target.lower() != "pep":
-        await ctx.send("Only supports for PEP doucments right now.")
+        await ctx.send("Only supports PEP right now.")
         return
     try:
         target_pep = f"pep-{number:04d}"
         cached_result = cache.get(target_pep)
+        author = ctx.message.author
         if cached_result:
-            await ctx.send(cached_result)
+            await ctx.send(f"{author.mention} Here you go:\n{cached_result}")
             return
         pep_text = await get_pep_text(target_pep)
         encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
@@ -48,7 +49,7 @@ async def tldr(ctx, target: str, number: int):
         summary = await summarize(target_pep, responses)
         # Caching for 10 mins
         cache.put(target_pep, summary, 60 * 10)
-        await ctx.send(summary)
+        await ctx.send(f"{author.mention} Here you go:\n{summary}")
     except Exception as e:
         await ctx.send(f"Error: {e}")
 

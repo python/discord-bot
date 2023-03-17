@@ -74,5 +74,5 @@ async def summarize(pep: str, texts: list[str]) -> str:
     )
     res = response.json()
     content = res["choices"][0]["text"].strip()
-    summary = f"Summary for {pep}:\n{content}\n\nFor more information: {link}"
+    summary = f"{content}\n\nFor more information: {link}"
     return summary
