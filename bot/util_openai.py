@@ -38,41 +38,47 @@ async def send_partial_text(text: str, target_pep: str) -> str:
         {"role": "system", "content": f"This is text summarization for {target_pep}"}
     ]
     messages.append({"role": "user", "content": prompt_request})
-    response = await openai_async.chat_complete(
-        OPEN_AI_API_KEY,
-        timeout=60,
-        payload={
-            "model": "gpt-3.5-turbo",
-            "messages": messages,
-            "temperature": 0.3,
-            "max_tokens": 500,
-            "top_p": 1.0,
-            "frequency_penalty": 0.0,
-            "presence_penalty": 1,
-        },
-    )
-    res = response.json()
-    return res["choices"][0]["message"]["content"].strip()
+    try:
+        response = await openai_async.chat_complete(
+            OPEN_AI_API_KEY,
+            timeout=60,
+            payload={
+                "model": "gpt-3.5-turbo",
+                "messages": messages,
+                "temperature": 0.3,
+                "max_tokens": 500,
+                "top_p": 1.0,
+                "frequency_penalty": 0.0,
+                "presence_penalty": 1,
+            },
+        )
+        res = response.json()
+        return res["choices"][0]["message"]["content"].strip()
+    except httpx.TimeoutException as e:
+        raise RuntimeError(f"Timeout while summarizing {target_pep}")
 
 
 async def summarize(pep: str, texts: list[str]) -> str:
     text = "\n".join(texts)
     link = f"https://peps.python.org/{pep}"
     prompt_request = f"Please summarize the text with bullet points: {text}"
-    response = await openai_async.complete(
-        OPEN_AI_API_KEY,
-        timeout=60,
-        payload={
-            "model": "text-davinci-003",
-            "prompt": prompt_request,
-            "temperature": 0.3,
-            "max_tokens": 150,
-            "top_p": 1.0,
-            "frequency_penalty": 0.0,
-            "presence_penalty": 1,
-        },
-    )
-    res = response.json()
-    content = res["choices"][0]["text"].strip()
-    summary = f"{content}\n\nFor more information: {link}"
-    return summary
+    try:
+        response = await openai_async.complete(
+            OPEN_AI_API_KEY,
+            timeout=60,
+            payload={
+                "model": "text-davinci-003",
+                "prompt": prompt_request,
+                "temperature": 0.3,
+                "max_tokens": 150,
+                "top_p": 1.0,
+                "frequency_penalty": 0.0,
+                "presence_penalty": 1,
+            },
+        )
+        res = response.json()
+        content = res["choices"][0]["text"].strip()
+        summary = f"{content}\n\nFor more information: {link}"
+        return summary
+    except httpx.TimeoutException as e:
+        raise RuntimeError(f"Timeout while summarizing {pep}")

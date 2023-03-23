@@ -1,14 +1,14 @@
-import os
-
 import discord
 import tiktoken
 from discord.ext import commands
 
 from conf import DISCORD_TOKEN
 from cache import SimpleTTLCache
+from misc import get_logger
 from util_openai import get_pep_text, text_to_chunks, send_partial_text, summarize
 
 
+logger = get_logger(__name__)
 intents = discord.Intents.default()
 intents.message_content = True
 cache = SimpleTTLCache(100)
@@ -17,8 +17,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 @bot.event
 async def on_ready():
-    # TODO: Need to use logger
-    print(f"Logged in as {bot.user.name}({bot.user.id})")
+    logger.info(f"Logged in as {bot.user.name}({bot.user.id})")
 
 
 @bot.command(name="ping")
@@ -28,6 +27,8 @@ async def ping(ctx):
 
 @bot.command(name="tldr")
 async def tldr(ctx, target: str, number: int):
+    requester = ctx.message.author
+    logger.info(f"requester: {requester}, target: {target}, number: {number}")
     if target.lower() != "pep":
         await ctx.send("Only supports PEP right now.")
         return
@@ -51,6 +52,7 @@ async def tldr(ctx, target: str, number: int):
         cache.put(target_pep, summary, 60 * 10)
         await ctx.send(f"{author.mention} Here you go:\n{summary}")
     except Exception as e:
+        logger.error("An exception was thrown!", exc_info=True)
         await ctx.send(f"Error: {e}")
 
 
