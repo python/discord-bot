@@ -17,21 +17,6 @@ def text_to_chunks(
         yield chunk
 
 
-async def get_pep_text(target_pep: str) -> str:
-    async with httpx.AsyncClient() as client:
-        target = f"https://raw.githubusercontent.com/python/peps/main/{target_pep}.rst"
-        res = await client.get(target)
-        if res.status_code != 200:
-            # fallback
-            target = (
-                f"https://raw.githubusercontent.com/python/peps/main/{target_pep}.txt"
-            )
-            res = await client.get(target)
-            if res.status_code != 200:
-                raise RuntimeError("Not found")
-        return res.text
-
-
 async def send_partial_text(text: str, target_doc: str) -> str:
     prompt_request = f"Summarize this documentation: {text})"
     messages = [

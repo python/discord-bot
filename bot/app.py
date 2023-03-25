@@ -5,8 +5,8 @@ from discord.ext import commands
 from conf import DISCORD_TOKEN
 from cache import SimpleTTLCache
 from misc import get_logger
-from util_github import get_gh_discuss
-from util_openai import get_pep_text, text_to_chunks, send_partial_text, summarize
+from util_meta import get_gh_discuss, get_pep_text
+from util_openai import text_to_chunks, send_partial_text, summarize
 
 
 logger = get_logger(__name__)
