@@ -7,10 +7,9 @@ import openai_async
 from conf import OPEN_AI_API_KEY
 
 
-def text_to_chunks(
-    encoding, text: str, chunk_size: int = 2000, overlap: int = 100
+def tokens_to_chunks(
+    tokens: list[int], chunk_size: int = 3000, overlap: int = 100
 ) -> Generator[list[int], None, None]:
-    tokens = encoding.encode(text)
     num_tokens = len(tokens)
     for i in range(0, num_tokens, chunk_size - overlap):
         chunk = tokens[i : i + chunk_size]
@@ -18,11 +17,10 @@ def text_to_chunks(
 
 
 async def send_partial_text(text: str, target_doc: str) -> str:
-    prompt_request = f"Summarize this documentation: {text})"
     messages = [
-        {"role": "system", "content": f"This is text summarization for {target_doc}"}
+        {"role": "system", "content": f"This is text summarization for {target_doc}"},
+        {"role": "user", "content": f"Summarize this documentation: {text}"},
     ]
-    messages.append({"role": "user", "content": prompt_request})
     try:
         response = await openai_async.chat_complete(
             OPEN_AI_API_KEY,
@@ -43,8 +41,7 @@ async def send_partial_text(text: str, target_doc: str) -> str:
         raise RuntimeError(f"Timeout while summarizing {target_pep}")
 
 
-async def summarize(link: str, texts: list[str]) -> str:
-    text = "\n".join(texts)
+async def summarize(link: str, text: str) -> str:
     prompt_request = f"Please summarize the text with bullet points: {text}"
     try:
         response = await openai_async.complete(
