@@ -32,10 +32,10 @@ async def get_pep_text(target_pep: str) -> str:
         return res.text
 
 
-async def send_partial_text(text: str, target_pep: str) -> str:
+async def send_partial_text(text: str, target_doc: str) -> str:
     prompt_request = f"Summarize this documentation: {text})"
     messages = [
-        {"role": "system", "content": f"This is text summarization for {target_pep}"}
+        {"role": "system", "content": f"This is text summarization for {target_doc}"}
     ]
     messages.append({"role": "user", "content": prompt_request})
     try:
@@ -58,9 +58,8 @@ async def send_partial_text(text: str, target_pep: str) -> str:
         raise RuntimeError(f"Timeout while summarizing {target_pep}")
 
 
-async def summarize(pep: str, texts: list[str]) -> str:
+async def summarize(link: str, texts: list[str]) -> str:
     text = "\n".join(texts)
-    link = f"https://peps.python.org/{pep}"
     prompt_request = f"Please summarize the text with bullet points: {text}"
     try:
         response = await openai_async.complete(
@@ -81,4 +80,4 @@ async def summarize(pep: str, texts: list[str]) -> str:
         summary = f"{content}\n\nFor more information: {link}"
         return summary
     except httpx.TimeoutException as e:
-        raise RuntimeError(f"Timeout while summarizing {pep}")
+        raise RuntimeError(f"Timeout while summarizing {link}")
